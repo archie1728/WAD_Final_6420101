@@ -14,11 +14,8 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
-
 import { useRouter } from 'next/navigation'
 
-
-// const pages = ['Products', 'Categories']; // UNUSED
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 export default function ResponsiveAppBar() {
@@ -48,7 +45,7 @@ export default function ResponsiveAppBar() {
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Button
-            key={1}
+            key="home"
             onClick={() => router.push('/')}
             sx={{ my: 2, color: 'white', display: 'block' }}
           >
@@ -67,7 +64,6 @@ export default function ResponsiveAppBar() {
                 textDecoration: 'none',
               }}
             >
-
               VMS
             </Typography>
           </Button>
@@ -99,17 +95,15 @@ export default function ResponsiveAppBar() {
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
-
-              <MenuItem key={1} onClick={() => router.push('/product')}>
+              <MenuItem key="products" onClick={() => router.push('/product')}>
                 <Typography sx={{ textAlign: 'center' }}>Products</Typography>
               </MenuItem>
-              <MenuItem key={2} onClick={() => router.push('/category')}>
+              <MenuItem key="categories" onClick={() => router.push('/category')}>
                 <Typography sx={{ textAlign: 'center' }}>Categories</Typography>
               </MenuItem>
-              <MenuItem key={3} onClick={() => router.push('/customer')}>
+              <MenuItem key="customers" onClick={() => router.push('/customer')}>
                 <Typography sx={{ textAlign: 'center' }}>Customers</Typography>
               </MenuItem>
-
             </Menu>
           </Box>
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -133,30 +127,28 @@ export default function ResponsiveAppBar() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             <Button
-              key={1}
+              key="products"
               onClick={() => router.push('/product')}
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
               Products
             </Button>
-
             <Button
-              key={2}
+              key="categories"
               onClick={() => router.push('/category')}
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
               Categories
             </Button>
-
             <Button
-              key={3}
+              key="customers"
               onClick={() => router.push('/customer')}
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
               Customers
             </Button>
-
-            {/* {pages.map((page) => (
+            {/* Commented out section
+            {pages.map((page) => (
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
@@ -164,10 +156,11 @@ export default function ResponsiveAppBar() {
               >
                 {page}
               </Button>
-            ))} */}
+            ))}
+            */}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-          // In the ResponsiveAppBar component
+            {/* In the ResponsiveAppBar component */}
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar>R</Avatar>
@@ -198,6 +191,6 @@ export default function ResponsiveAppBar() {
           </Box>
         </Toolbar>
       </Container>
-    </AppBar >
+    </AppBar>
   );
 }

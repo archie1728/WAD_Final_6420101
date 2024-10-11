@@ -19,7 +19,11 @@ export default function CustomerList() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            setCustomers(data);
+            if (data.message === 'No customers found') {
+                setCustomers([]);
+            } else {
+                setCustomers(data.customers || data); // Fallback to data if customers property doesn't exist
+            }
         } catch (error) {
             console.error("There was a problem with the fetch operation:", error);
             setError("Failed to load customers. Please try again later.");
@@ -56,62 +60,70 @@ export default function CustomerList() {
     }
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Customer List</h1>
-            <Link href="/customer/new">
-                <Button variant="contained" color="primary" className="mb-4">Add New Customer</Button>
+        <Box sx={{ maxWidth: 800, margin: 'auto', mt: 4 }}>
+            <Typography variant="h4" component="h1" gutterBottom>
+                Customer List
+            </Typography>
+            <Link href="/customer/new" passHref>
+                <Button variant="contained" color="primary" sx={{ mb: 2 }}>
+                    Add New Customer
+                </Button>
             </Link>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Date of Birth</TableCell>
-                            <TableCell>Member Number</TableCell>
-                            <TableCell>Interests</TableCell>
-                            <TableCell>Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {customers.map((customer) => (
-                            <TableRow 
-                                key={customer._id} 
-                                hover 
-                                onClick={() => router.push(`/customer/${customer._id}/detail`)}
-                                style={{cursor: 'pointer'}}
-                            >
-                                <TableCell>{customer.name}</TableCell>
-                                <TableCell>{new Date(customer.dateOfBirth).toLocaleDateString()}</TableCell>
-                                <TableCell>{customer.memberNumber}</TableCell>
-                                <TableCell>{customer.interests}</TableCell>
-                                <TableCell>
-                                    <Button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            router.push(`/customer/${customer._id}`);
-                                        }} 
-                                        variant="outlined" 
-                                        color="primary" 
-                                        sx={{ mr: 1 }}
-                                    >
-                                        Edit
-                                    </Button>
-                                    <Button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            deleteCustomer(customer._id);
-                                        }} 
-                                        variant="outlined" 
-                                        color="secondary"
-                                    >
-                                        Delete
-                                    </Button>
-                                </TableCell>
+            {customers.length === 0 ? (
+                <Typography sx={{ mt: 2 }}>No customers found. Add a new customer to get started.</Typography>
+            ) : (
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Name</TableCell>
+                                <TableCell>Date of Birth</TableCell>
+                                <TableCell>Member Number</TableCell>
+                                <TableCell>Interests</TableCell>
+                                <TableCell>Actions</TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </div>
+                        </TableHead>
+                        <TableBody>
+                            {customers.map((customer) => (
+                                <TableRow 
+                                    key={customer._id} 
+                                    hover 
+                                    onClick={() => router.push(`/customer/${customer._id}/detail`)}
+                                    style={{cursor: 'pointer'}}
+                                >
+                                    <TableCell>{customer.name}</TableCell>
+                                    <TableCell>{new Date(customer.dateOfBirth).toLocaleDateString()}</TableCell>
+                                    <TableCell>{customer.memberNumber}</TableCell>
+                                    <TableCell>{customer.interests}</TableCell>
+                                    <TableCell>
+                                        <Button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                router.push(`/customer/${customer._id}`);
+                                            }} 
+                                            variant="outlined" 
+                                            color="primary" 
+                                            sx={{ mr: 1 }}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteCustomer(customer._id);
+                                            }} 
+                                            variant="outlined" 
+                                            color="secondary"
+                                        >
+                                            Delete
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
+        </Box>
     );
 }

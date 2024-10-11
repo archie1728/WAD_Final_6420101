@@ -1,36 +1,56 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { Typography, CircularProgress } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
+import { Typography, TextField, Button, Box, CircularProgress } from '@mui/material';
 
-export default function CustomerList() {
-  const [customers, setCustomers] = useState([]);
+export default function CustomerEdit({ params }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
   const APIBASE = process.env.NEXT_PUBLIC_API_BASE;
+  const { control, handleSubmit, reset } = useForm();
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
-  const fetchCustomers = async () => {
+  const fetchCustomer = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${APIBASE}/customer`);
+      const response = await fetch(`${APIBASE}/customer/${params.id}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setCustomers(data);
+      reset(data);
     } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
-      setError(`Failed to load customers. ${error.message}`);
+      console.error("Error fetching customer:", error);
+      setError("Failed to load customer details. Please try again later.");
     } finally {
       setLoading(false);
     }
+  }, [APIBASE, params.id, reset]);
+
+  useEffect(() => {
+    fetchCustomer();
+  }, [fetchCustomer]);
+
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch(`${APIBASE}/customer/${params.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      router.push('/customer');
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      setError("Failed to update customer. Please try again.");
+    }
   };
 
-  if (loading) return <CircularProgress />;
-  if (error) return <Typography color="error">{error}</Typography>;
+  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
+  if (error) return <Typography color="error" sx={{ mt: 4, textAlign: 'center' }}>{error}</Typography>;
 
   return (
     <Box sx={{ maxWidth: 400, margin: 'auto', mt: 4 }}>

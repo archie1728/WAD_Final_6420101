@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Typography, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -11,11 +11,7 @@ export default function CustomerList() {
     const router = useRouter();
     const APIBASE = process.env.NEXT_PUBLIC_API_BASE;
 
-    useEffect(() => {
-        fetchCustomers();
-    }, []);
-
-    const fetchCustomers = async () => {
+    const fetchCustomers = useCallback(async () => {
         try {
             setLoading(true);
             const response = await fetch(`${APIBASE}/customer`);
@@ -30,7 +26,11 @@ export default function CustomerList() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [APIBASE]);
+
+    useEffect(() => {
+        fetchCustomers();
+    }, [fetchCustomers]);
 
     const deleteCustomer = async (id) => {
         if (window.confirm('Are you sure you want to delete this customer?')) {

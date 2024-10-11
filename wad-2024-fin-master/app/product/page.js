@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export default function Home() {
   const APIBASE = process.env.NEXT_PUBLIC_API_URL;
@@ -10,12 +10,7 @@ export default function Home() {
   const [category, setCategory] = useState([]);
   const [editMode, setEditMode] = useState(false);
 
-  const startEdit = (product) => async () => {
-    setEditMode(true);
-    reset(product);
-  };
-
-  async function fetchProducts() {
+  const fetchProducts = useCallback(async () => {
     const data = await fetch(`${APIBASE}/product`);
     const p = await data.json();
     const p2 = p.map((product) => {
@@ -23,13 +18,18 @@ export default function Home() {
       return product;
     });
     setProducts(p2);
-  }
+  }, [APIBASE]);
 
-  async function fetchCategory() {
+  const fetchCategory = useCallback(async () => {
     const data = await fetch(`${APIBASE}/category`);
     const c = await data.json();
     setCategory(c);
-  }
+  }, [APIBASE]);
+
+  useEffect(() => {
+    fetchCategory();
+    fetchProducts();
+  }, [fetchCategory, fetchProducts]);
 
   const createProductOrUpdate = async (data) => {
     if (editMode) {

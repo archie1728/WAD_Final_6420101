@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Typography, Paper, Button, Box, CircularProgress } from '@mui/material';
 
@@ -10,11 +10,7 @@ export default function CustomerDetail({ params }) {
   const router = useRouter();
   const APIBASE = process.env.NEXT_PUBLIC_API_BASE;
 
-  useEffect(() => {
-    fetchCustomer();
-  }, []);
-
-  const fetchCustomer = async () => {
+  const fetchCustomer = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${APIBASE}/customer/${params.id}`);
@@ -29,7 +25,12 @@ export default function CustomerDetail({ params }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [APIBASE, params.id]);
+
+  useEffect(() => {
+    fetchCustomer();
+  }, [fetchCustomer]);
+
 
   if (loading) {
     return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;

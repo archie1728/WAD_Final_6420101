@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 
@@ -10,7 +10,7 @@ export default function Home() {
 
   const { register, handleSubmit, reset } = useForm();
 
-  async function fetchCategory() {
+  const fetchCategory = useCallback(async () => {
     const data = await fetch(`${APIBASE}/category`);
     const c = await data.json();
     const c2 = c.map((category) => {
@@ -18,26 +18,11 @@ export default function Home() {
       return category;
     });
     setCategoryList(c2);
-  }
-
-  const startEdit = (category) => async () => {
-    setEditMode(true);
-    reset(category);
-  }
-
-  const deleteById = (id) => async () => {
-    if (!confirm("Are you sure?")) return;
-
-    await fetch(`${APIBASE}/category/${id}`, {
-      method: "DELETE",
-    });
-    fetchCategory();
-  }
-
+  }, [APIBASE]);
 
   useEffect(() => {
     fetchCategory();
-  }, []);
+  }, [fetchCategory]);
 
   function handleCategoryFormSubmit(data) {
     if (editMode) {

@@ -1,51 +1,36 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { TextField, Button, Box, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { Typography, CircularProgress } from '@mui/material';
 
-export default function UpdateCustomer({ params }) {
-  const { control, handleSubmit, setValue } = useForm();
-  const [customer, setCustomer] = useState(null);
-  const router = useRouter();
+export default function CustomerList() {
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const APIBASE = process.env.NEXT_PUBLIC_API_BASE;
 
   useEffect(() => {
-    fetchCustomer();
+    fetchCustomers();
   }, []);
 
-  const fetchCustomer = async () => {
+  const fetchCustomers = async () => {
     try {
-      const response = await fetch(`${APIBASE}/customer/${params.id}`);
-      if (!response.ok) throw new Error('Failed to fetch customer');
+      setLoading(true);
+      const response = await fetch(`${APIBASE}/customer`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setCustomer(data);
-      // Set form values
-      setValue('name', data.name);
-      setValue('dateOfBirth', new Date(data.dateOfBirth).toISOString().split('T')[0]);
-      setValue('memberNumber', data.memberNumber);
-      setValue('interests', data.interests);
+      setCustomers(data);
     } catch (error) {
-      console.error("Error fetching customer:", error);
+      console.error("There was a problem with the fetch operation:", error);
+      setError(`Failed to load customers. ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const onSubmit = async (data) => {
-    try {
-      const response = await fetch(`${APIBASE}/customer/${params.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to update customer');
-      router.push('/customer');
-    } catch (error) {
-      console.error("Error updating customer:", error);
-      alert('Error updating customer');
-    }
-  };
-
-  if (!customer) return <Typography>Loading...</Typography>;
+  if (loading) return <CircularProgress />;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Box sx={{ maxWidth: 400, margin: 'auto', mt: 4 }}>
